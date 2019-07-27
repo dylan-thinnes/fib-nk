@@ -1,0 +1,9 @@
+#!/bin/bash
+PROGNAME=$1
+K=$2
+N=$3
+
+$PROGNAME $K $N | while read line
+do 
+    echo $line | cut -f 1-$K -d ' '
+done
