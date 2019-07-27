@@ -1,12 +1,16 @@
+{-# LANGUAGE OverloadedLists #-}
 import Prelude hiding (cycle)
 import qualified Prelude (cycle)
 import qualified Data.Set as S
 import Data.Maybe (fromMaybe)
+import Data.Foldable (toList)
+import qualified Data.Sequence as Seq
+import Data.Sequence (Seq(..), (><))
 import System.Environment
 
 type Seed = [Int]
 type Step = Seed -> Seed
-newtype Cycle = Cycle { uncycle :: [Seed] }
+newtype Cycle = Cycle { uncycle :: Seq Seed }
 data Group = Group { k :: Int
                    , n :: Int
                    , ungroup :: [Cycle]
@@ -31,6 +35,7 @@ incrMod n ys = let (x:xs) = incr ys in mod x n : xs
 domain :: Int -> Int -> Domain
 domain n k = S.fromList $ f n k
     where
+    f :: Int -> Int -> [Seed]
     f n 1 = pure <$> [0..n-1]
     f n k = (:) <$> [0..n-1] <*> f n (k-1)
 
@@ -42,7 +47,8 @@ fibnk n k = Group k n $ cycles (incrMod n) $ domain n k
 
 -- Find the cycle of an injective function on a finite domain, given a seed val
 cycle :: Step -> Seed -> Cycle
-cycle step seed = Cycle $ seed : takeWhile (/= seed) (iterate step (step seed))
+cycle step seed = Cycle $ Seq.fromList 
+                $ seed : takeWhile (/= seed) (iterate step (step seed))
 
 -- Find all the cycles of an injective function on a finite domain, given a set
 -- for the domain
@@ -60,7 +66,8 @@ cycles step domain = f domain []
 -- Pretty printing of cycles and groups
 
 instance Show Cycle where
-    show (Cycle c) = unwords $ map show $ reverse (head c) ++ map head (tail c)
+    show (Cycle (_ :<| c)) 
+      = unwords $ toList $ fmap (show . head) c
 
 instance Show Group where
     show (Group _ _ cycles) = unlines $ map f $ zip [0..] cycles
@@ -78,6 +85,6 @@ debugGroup (Group n k cycles) = unlines $ map debugCycle $ cycles
     where
     debugCycle cycle 
       = let states = uncycle cycle
-            values = map head states
-         in unwords $ map show 
-                    $ values ++ take (n-1) (Prelude.cycle values)
+            values = fmap head states
+         in unwords $ map show $ toList
+          $ values >< Seq.take (n-1) (Seq.cycleTaking (n-1) values)
