@@ -1,10 +1,7 @@
 import Prelude hiding (cycle)
 import qualified Prelude (cycle)
 import qualified Data.Set as S
-import qualified Data.Map as M
 import Data.Maybe (fromMaybe)
-import Control.Arrow ((&&&))
-import System.IO
 import System.Environment
 
 type Seed = [Int]
@@ -72,12 +69,6 @@ instance Show Group where
         f (n,c) = "Cycle #" ++ show n ++ ":\n " ++ show c
                   ++ "\n  length: " ++ show (length $ uncycle c)
 
-cycleLengths :: Group -> M.Map Int Int
-cycleLengths (Group _ _ cycles) = foldr f M.empty cycles
-    where
-    f = M.alter g . length . uncycle
-    g = Just . (+1) . fromMaybe 0
-
 -- Show a group in the simplest way possible, one line per cycle, one word per
 -- element
 -- Make sure that the end is padded w/ values from the beginning, so that all
@@ -90,22 +81,3 @@ debugGroup (Group n k cycles) = unlines $ map debugCycle $ cycles
             values = map head states
          in unwords $ map show 
                     $ values ++ take (n-1) (Prelude.cycle values)
-
--- Aggregate reports
-
-report :: [((Int, Int), M.Map Int Int)]
-report = map (id &&& (\(n,k) -> cycleLengths $ fibnk n k))
-       $ (,) <$> [2..20] <*> [2..5]
-
-reportStr :: String
-reportStr = unlines $ showRun <$> report
-    where
-    showRun ((n,k),lengths)
-      = unwords
-      $ [show n, show k, ":"
-        ,show $ sum $ uncurry (*) <$> M.toList lengths
-        ] ++ map show (M.toList lengths)
-
-printReport :: Handle -> IO ()
-printReport handle = hPutStr handle reportStr
-
