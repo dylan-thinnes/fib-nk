@@ -78,7 +78,7 @@ loops back on itself instantly.
 Since these partitions are completely disjoint, the function can be said to
 form equivalence classes on pairs in the same sequence.
 
-## Enter N & K
+## Changing K & N
 So, the first example added together the previous 2 values, and modulo'd them
 by 10.
 
@@ -89,3 +89,92 @@ The second term (10) is the "n", the modulo to take over each sum.
 
 Varying the n & k make for differently long cycles w/ different patterns.
 
+## Trying K = 3, N = 10
+
+For example, let's take k = 3, and keep n = 10.
+
+There are 3 numbers in each tuple, and each number can take on 10 values (0 to
+9), thus there are 10^3 = 1000 tuples in the domain.
+
+Since k = 3, we'll need to choose three seed values for our first sequence.
+Let's pick 0 0 1.
+
+```
+(0 0 1) -> (0 1 1) -> (1 1 2) -> (1 2 4) -> (2 4 7) -> (4 7 3) -> (7 3 4) -> ...
+ 0          0          1          1          2          4          7
+```
+
+This seed produces a sequence 124 elements long. There are 20 sequences which
+partition the state space completely.
+
+## What next?
+
+Different choices of n & k produce very different results, but many of them
+seem to follow a pattern.
+
+If you compile the C program above, it takes values k & n as arguments and then
+prints all of the cycles, composed of their elements in order, like so:
+
+```
+> ./c 3 4
+0 0 0
+1 0 0 1 1 2 0 3 1 0
+2 0 0 2 2 0
+3 0 0 3 3 2 0 1 3 0
+0 1 0 1 2 3 2 3 0 1
+1 1 0 2 3 1 2 2 1 1
+2 1 0 3 0 3 2 1 2 1
+0 2 0 2
+3 3 0 2 1 3 2 2 3 3
+1 1 1 3 1 1
+3 3 1 3 3 3
+2 2 2
+```
+
+Using a few simple bash scripts, we can get the length of each cycle
+
+```
+> ./c 3 4 | while read line; do echo $line | cut -f 3- -d ' ' | wc -w; done
+1
+8
+4
+8
+8
+8
+8
+2
+8
+4
+4
+1
+```
+
+By tacking on two more simple pipes, we can figure out the frequencies of each
+length of cycle.
+
+```
+> # First number is the frequency, second number is the length
+> ./c 3 4 | while read line; do echo $line | cut -f 3- -d ' ' | wc -w; done | sort -n | uniq -c
+2 1
+1 2
+3 4
+6 8
+```
+
+As you can see, all the cycles's lengths fall into certain buckets. This result
+is particularly interesting for larger n & k.
+
+```
+> ./c 4 10 | while read line; do echo $line | cut -f 4- -d ' ' | wc -w; done | sort -n | uniq -c
+1 1
+3 5
+2 312
+6 1560
+```
+
+Finding & explaining a formula for the lengths of all cycle w/ n & k would be a
+fun piece of work. Tell me if you do!
+
+Otherwise, a (memory-efficient) way of computing a cycle & finding the next
+seed w/o needing to keep the whole domain in memory would be very interesting
+too.
