@@ -1,0 +1,126 @@
+# Read n & k
+?
+sk
+?
+sn
+# Generate upper bound
+ln
+lk
+^
+sb
+
+# Loop, w/ counter i & body x & postprocess p
+[
+    Li 1- Si
+    lxx
+    li 0 <L
+    lpx
+]sL
+
+# Loop into reg a's stack up till i, then exit, rebuilding reg a as we do
+[
+    la
+    lxx
+    La
+    r
+    Li 1- Si
+    li 0 <R
+    r
+    Sa
+]sR
+
+# Initialize c for curr state to 0
+0sc
+# Updates curr state "c" from top of "a" stack, and marks it in history
+[
+    lc
+        ln*
+        lb%
+        la+
+    sc
+]sU
+
+# Mark position of curr state c as "1" in history
+[
+    1 lc:h
+]sM
+
+# Initialize stack length to "l"
+lksl
+# Calculate & grow stack "a" w/ new value
+[
+    lksi
+    [+]sx
+    0lRx
+    ln%
+    Sa
+    ll1+sl
+]sI
+
+# Debug current state & stack "a"'s values
+[
+    # [Current state: ]Plcn
+    # [, Current stack: ]P
+    llsi
+    [La]sx
+    [dn[ ]PSa]sp
+    lLx
+    [ ]ps_
+]sD
+
+# Get next history state
+[
+    [
+        lc1+sc
+        lHx
+    ]st
+
+    lc;h
+    1
+    =t
+]sH
+
+# State to stack "a"
+[
+    lksl
+    lc
+    [ln~St]sx
+    [LtSa]sp
+    lksi
+    lLx
+]s2
+l2x
+
+# Find all groups
+[
+    # Save current state as "original"
+    lcso
+    # Continue until state loops back on itself
+    [
+        lMx
+        lIx
+        lUx
+        lolc!=G
+    ]sG
+    lGx
+
+    # Truncate last element of stack "a"
+    Las_
+    ll1-sl
+
+    # Debug print state
+    lDx
+
+    # Clear stack "a"
+    [Las_]sx[]sp
+    llsi
+    lLx
+
+    # Get next state
+    lHx
+    l2x
+
+    # If we've haven't exhausted the seeds, continue
+    lc lb >F
+]sF
+lFx
