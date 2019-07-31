@@ -13,7 +13,7 @@ repeatedly, and (very!) simple data structures.
 
 # What is Fib N-K?
 
-Fib N-K is a math game.
+Fib N-K is a group of sequences which can be quite fun to calculate.
 
 The standard fibonacci sequence starts with two numbers (the "seed"), a and b,
 which are a = 0 and b = 1.  
