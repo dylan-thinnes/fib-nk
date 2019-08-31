@@ -4,25 +4,48 @@
 # Generate upper bound
 ln lk ^ sb
 
-# Loop, w/ counter i & body x & postprocess p
+# General for loop, w/ counter i & body x & postprocess p
 [
-    Li 1- Si
-    lxx
-    li 0 <L
-    lpx
+    0sd
+    [
+        Si Sx Sp
+
+        # Increment the depth
+        ld1+sd
+        [
+            Li1-Si
+            lpx
+            li 0 <'
+            lxx
+            Li1+Si
+        ]S'
+        li 0 <'
+        ld1-sd
+
+        Lis_ Lxs_ Lps_ L's_
+    ]sL
+    lLx
 ]sL
 
-# Loop into reg a's stack up till i, then exit, rebuilding reg a as we do
+# General while loop, w/ condition p & body < & postprocess >
 [
-    la
-    lxx
-    La
-    r
-    Li 1- Si
-    li 0 <R
-    r
-    Sa
-]sR
+    0sd
+    [
+        S? S> S<
+
+        ld1+sd
+        [
+            l<x
+            l?x 0 <'
+            l>x
+        ]S'
+        l?x 0 <'
+        ld1-sd
+
+        L?s_ L>s_ L<s_ L's_
+    ]sW
+    lWx
+]sW
 
 # Initialize c for curr state to 0
 0sc
@@ -44,23 +67,40 @@ ln lk ^ sb
 lksl
 # Calculate & grow stack "a" w/ new value
 [
-    lksi
-    [+]sx
-    0lRx
+    0
+    [
+        la+
+        Lar
+    ]
+    [
+        rSa
+    ]
+    lk
+    lLx
+
     ln%
     Sa
     ll1+sl
 ]sI
 
-# Debug current state & stack "a"'s values
+# Debug print stack "a"'s values
 [
-    # [Current state: ]Plcn
-    # [, Current stack: ]P
-    llsi
-    [La]sx
-    [dn[ ]PSa]sp
+    # Traverse stack from bottom up
+    [La]
+    [
+        Sa
+
+        # Print separating space
+        [[ ]P]Sx
+        li 0 !=x
+        Lxs_
+
+        # Print next number
+        lan
+    ]
+    ll
     lLx
-    [ ]ps_
+    []ps_
 ]sD
 
 # Get next history state
@@ -79,10 +119,8 @@ lksl
 [
     lksl
     lc
-    [ln~St]sx
-    [LtSa]sp
-    lksi
-    lLx
+
+    [ln~Sb] [LbSa] lk lLx
 ]s2
 l2x
 
@@ -95,9 +133,13 @@ l2x
         lMx
         lIx
         lUx
-        lolc!=G
-    ]sG
-    lGx
+    ]dx # Run once before loop starts to emulate do ... while
+    []
+    [
+        lolc-
+        d*
+    ]
+    lWx
 
     # Truncate last element of stack "a"
     Las_
@@ -107,15 +149,14 @@ l2x
     lDx
 
     # Clear stack "a"
-    [Las_]sx[]sp
-    llsi
+    [Las_]
+    []
+    ll1-
     lLx
 
     # Get next state
     lHx
     l2x
 
-    # If we've haven't exhausted the seeds, continue
-    lc lb >F
-]sF
-lFx
+    # If we've haven't exhausted the state space, continue
+] [] [lb lc -] lWx
