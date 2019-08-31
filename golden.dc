@@ -1,13 +1,8 @@
-# Read n & k
-?
-sk
-?
-sn
+# Read k & n
+? sk
+? sn
 # Generate upper bound
-ln
-lk
-^
-sb
+ln lk ^ sb
 
 # Loop, w/ counter i & body x & postprocess p
 [
@@ -34,9 +29,9 @@ sb
 # Updates curr state "c" from top of "a" stack, and marks it in history
 [
     lc
-        ln*
-        lb%
-        la+
+    ln*
+    lb%
+    la+
     sc
 ]sU
 
