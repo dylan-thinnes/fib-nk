@@ -6,13 +6,13 @@ def next($n):
 # Finds a cycle from a seed
 def cycle($n):
     . as $initial
-|   [   next($n)
+|   [.] + 
+    [   next($n)
     |   while(
             $initial != .;
             next($n)
         )
     ]
-|   [$initial] + .
 ;
 
 # Creates the entire domain
@@ -53,7 +53,7 @@ def next_cycle($n):
 |   .[1]
 |   .[]
 |   [
-        [.[] | .[0]] + .[0][0:-1] 
+        map(.[0]) + .[0][0:-1] 
     |   .[] | tostring
     ]
 |   join(" ")
