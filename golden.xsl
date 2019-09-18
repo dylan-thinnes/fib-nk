@@ -5,12 +5,6 @@
 <xsl:variable name="n" select="/inputs/n"/>
 <xsl:variable name="k" select="/inputs/k"/>
 <xsl:template match="/">
-    <!--
-    <xsl:call-template name="increment_seed">
-        <xsl:with-param name="k" select="/inputs/k"/>
-        <xsl:with-param name="seed" select="'0 0 9'"/>
-    </xsl:call-template>
-    -->
     <xsl:call-template name="find_all_cycles">
         <xsl:with-param name="k" select="/inputs/k"/>
         <xsl:with-param name="seed" select="'0 0 0'"/>
