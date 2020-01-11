@@ -35,4 +35,4 @@
     (clojure.string/join
       " "
       (mapv #(mod % n)
-        (apply conj spool (take (- n 1) spool))))))
+        (apply conj spool (take (- k 1) spool))))))
