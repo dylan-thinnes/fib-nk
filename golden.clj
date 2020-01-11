@@ -3,7 +3,7 @@
 (def k (Integer/parseInt (first  *command-line-args*)))
 (def n (Integer/parseInt (second *command-line-args*)))
 
-(defn next_seed [seed]
+(defn next_seed [seed n k]
   (+
     (mod (* seed n) (int (Math/floor (Math/pow n k))))
     (loop [seed seed acc 0]
@@ -11,8 +11,8 @@
           (mod acc n)
           (recur (quot seed n) (+ acc (mod seed n)))))))
 
-(defn cycles []
-  (reduce #(assoc %1 %2 (next_seed %2)) {} (range (Math/pow n k))))
+(defn cycles [n k]
+  (reduce #(assoc %1 %2 (next_seed %2 n k)) {} (range (Math/pow n k))))
 
 (defn unspool [m orig]
   (loop [k orig acc '()]
@@ -30,7 +30,7 @@
           (recur (apply dissoc m spool) (conj acc spool))))))
 
 (doseq
-  [spool (unspool-all (cycles))]
+  [spool (unspool-all (cycles n k))]
   (println
     (clojure.string/join
       " "
